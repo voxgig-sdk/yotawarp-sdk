@@ -1,0 +1,163 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "YotaWarp API",
+    "version": "1.0.0",
+    "description": "Generates a real Cloudflare WARP WireGuard configuration (optionally with AmneziaWG DPI-bypass parameters) on every call. Knowledge source: the generator page https://yota-warp-self.vercel.app/ (its inline script builds GET /api/generate?dns&mtu&allowed_ips&keepalive&amnezia) plus 3 live GET probes on 2026-10-23 (all parameters, no parameters, and an invalid mtu). Every parameter is optional; omitted ones default to the values below. The server does NO validation: mtu=abc was written into the config verbatim with HTTP 200. Each call returns a new private key and a different WARP IPv6 address (it appears to register a new WARP device), so responses are never identical. Unverified: the failure response shape (success=false with an 'error' string, per the page script) was never observed.",
+    "contact": {
+      "name": "YotaWarp",
+      "url": "https://yota-warp-self.vercel.app/"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://yota-warp-self.vercel.app",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "WarpConfig"
+    }
+  ],
+  "paths": {
+    "/api/generate": {
+      "get": {
+        "summary": "Generate a WARP config",
+        "description": "Returns a newly generated Cloudflare WARP WireGuard / AmneziaWG configuration (new key pair per call).",
+        "operationId": "generateWarpConfig",
+        "tags": [
+          "WarpConfig"
+        ],
+        "parameters": [
+          {
+            "name": "dns",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated DNS servers written to the Interface DNS line. Default '1.1.1.1, 1.0.0.1, 2606:4700:4700::1111, 2606:4700:4700::1001'.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "1.1.1.1, 1.0.0.1"
+          },
+          {
+            "name": "mtu",
+            "in": "query",
+            "required": false,
+            "description": "Interface MTU, copied into the config without validation. Default 1280.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "1280"
+          },
+          {
+            "name": "allowed_ips",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated Peer AllowedIPs. Default '0.0.0.0/0, ::/0'.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0.0.0.0/0, ::/0"
+          },
+          {
+            "name": "keepalive",
+            "in": "query",
+            "required": false,
+            "description": "Peer PersistentKeepalive in seconds. Default 25.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "25"
+          },
+          {
+            "name": "amnezia",
+            "in": "query",
+            "required": false,
+            "description": "'true' adds AmneziaWG obfuscation parameters (DPI bypass); default 'false' (plain WireGuard).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "example": "false"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarpConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "WarpConfig": {
+        "type": "object",
+        "description": "A freshly generated Cloudflare WARP client configuration.",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "true on success. The site's own client reads an 'error' string when this is false; no failure was observed."
+          },
+          "config": {
+            "type": "string",
+            "description": "Complete WireGuard (or AmneziaWG when amnezia=true) .conf text: [Interface] with a freshly generated PrivateKey, Address, DNS, MTU (plus AmneziaWG obfuscation keys S1/S2/Jc/Jmin/Jmax/H1-H4/I1 when amnezia=true) and [Peer] with PublicKey, AllowedIPs, Endpoint and PersistentKeepalive. Includes a Russian-language comment header."
+          },
+          "vpnKey": {
+            "type": "string",
+            "description": "AmneziaVPN import key: 'vpn://' followed by a base64 payload. Present with amnezia=true and amnezia=false."
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "endpoint": {
+                "type": "string",
+                "description": "Cloudflare WARP registration endpoint, e.g. 'engage.cloudflareclient.com:2408'. The config's own Peer Endpoint can differ."
+              },
+              "ipv4": {
+                "type": "string",
+                "description": "Interface IPv4 address assigned by WARP, e.g. '172.16.0.2'."
+              },
+              "ipv6": {
+                "type": "string",
+                "description": "Interface IPv6 address assigned by WARP."
+              },
+              "amnezia": {
+                "type": "boolean",
+                "description": "Whether AmneziaWG obfuscation parameters were added."
+              },
+              "generated_at": {
+                "type": "string",
+                "description": "Generation time.",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "endpoint",
+              "ipv4",
+              "ipv6",
+              "amnezia",
+              "generated_at"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "config",
+          "metadata"
+        ]
+      }
+    }
+  }
+}

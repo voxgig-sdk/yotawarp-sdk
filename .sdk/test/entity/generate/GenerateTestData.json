@@ -1,0 +1,44 @@
+{
+  "existing": {
+    "generate": {
+      "GENERATE00": {
+        "config": "s28",
+        "metadata": {},
+        "success": true,
+        "vpnKey": "s2b",
+        "id": "GENERATE00"
+      },
+      "GENERATE01": {
+        "config": "s50",
+        "metadata": {},
+        "success": true,
+        "vpnKey": "s53",
+        "id": "GENERATE01"
+      },
+      "GENERATE02": {
+        "config": "s78",
+        "metadata": {},
+        "success": true,
+        "vpnKey": "s7b",
+        "id": "GENERATE02"
+      }
+    }
+  },
+  "new": {
+    "generate": {
+      "generate_ref01": {
+        "config": "sa0",
+        "metadata": {},
+        "success": true,
+        "vpnKey": "sa3"
+      }
+    }
+  },
+  "requests": {
+    "GET /api/generate": {
+      "provenance": "operation-contract",
+      "version": 2,
+      "source": "openapi3"
+    }
+  }
+}

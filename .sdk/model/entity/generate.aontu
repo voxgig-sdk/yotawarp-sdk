@@ -1,0 +1,117 @@
+# Entity: generate
+
+main: kit: entity: generate: {
+
+  alias: field: {}
+
+  fields: {
+    config: {
+      h: "Config"
+      n: "config"
+      r: true
+      sh: "Complete WireGuard (or AmneziaWG when amnezia=true) .conf text: [Interface] with a freshly generated PrivateKey, Address, DNS, MTU (plus AmneziaWG obfuscation keys S1/S2/Jc/Jmin/Jmax/H1-H4/I1 when amnezia=true) and [Peer] with PublicKey,…"
+      t: "`$STRING`"
+    }
+    metadata: {
+      h: "Metadata"
+      n: "metadata"
+      r: true
+      t: "`$OBJECT`"
+    }
+    success: {
+      h: "Success"
+      n: "success"
+      r: true
+      sh: "true on success."
+      t: "`$BOOLEAN`"
+    }
+    vpnKey: {
+      h: "Vpn Key"
+      n: "vpnKey"
+      r: false
+      sh: "AmneziaVPN import key: 'vpn://' followed by a base64 payload."
+      t: "`$STRING`"
+    }
+  }
+
+  name: "generate"
+  op: {
+    load: {
+      name: "load"
+      points: [
+        {
+          co: {
+            id: "GET /api/generate"
+            source: "openapi3"
+            version: 2
+          }
+          g: {
+            query: [
+              {
+                ex: "0.0.0.0/0, ::/0"
+                k: "query"
+                n: "allowed_ip"
+                or: "allowed_ips"
+                r: false
+                t: "`$STRING`"
+              }
+              {
+                ex: "false"
+                k: "query"
+                n: "amnezia"
+                or: "amnezia"
+                r: false
+                t: "`$STRING`"
+              }
+              {
+                ex: "1.1.1.1, 1.0.0.1"
+                k: "query"
+                n: "dns"
+                or: "dns"
+                r: false
+                t: "`$STRING`"
+              }
+              {
+                ex: "25"
+                k: "query"
+                n: "keepalive"
+                or: "keepalive"
+                r: false
+                t: "`$STRING`"
+              }
+              {
+                ex: "1280"
+                k: "query"
+                n: "mtu"
+                or: "mtu"
+                r: false
+                t: "`$STRING`"
+              }
+            ]
+          }
+          m: "GET"
+          o: "/api/generate"
+          rs: {
+            kind: "json"
+            media: "application/json"
+          }
+          s: [
+            {
+              lit: "api"
+            }
+            {
+              lit: "generate"
+            }
+          ]
+          t: {
+            req: "`reqdata`"
+            res: "`body`"
+          }
+        }
+      ]
+    }
+  }
+
+
+
+}

@@ -1,0 +1,26 @@
+# API Information
+
+
+main: {
+  kit: {
+    info: {
+      auth: false
+      contact: {
+        name: "YotaWarp"
+        url: "https://yota-warp-self.vercel.app/"
+      }
+      description: "Generates a real Cloudflare WARP WireGuard configuration (optionally with AmneziaWG DPI-bypass parameters) on every call. Knowledge source: the generator page https://yota-warp-self.vercel.app/ (its inline script builds GET /api/generate?dns&mtu&allowed_ips&keepalive&amnezia) plus 3 live GET probes on 2026-10-23 (all parameters, no parameters, and an invalid mtu). Every parameter is optional; omitted ones default to the values below. The server does NO validation: mtu=abc was written into the config verbatim with HTTP 200. Each call returns a new private key and a different WARP IPv6 address (it appears to register a new WARP device), so responses are never identical. Unverified: the failure response shape (success=false with an 'error' string, per the page script) was never observed."
+      servers: [
+        {
+          description: "Production server"
+          url: "https://yota-warp-self.vercel.app"
+        }
+      ]
+      summary: "Generates a real Cloudflare WARP WireGuard configuration (optionally with AmneziaWG DPI-bypass parameters) on every call."
+      title: "YotaWarp API"
+      version: "1.0.0"
+      website: "https://yota-warp-self.vercel.app"
+    }
+  }
+}
+
